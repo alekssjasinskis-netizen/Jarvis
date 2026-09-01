@@ -1,102 +1,83 @@
-```python
 import os
 import random
 import speech_recognition
 import webbrowser
 
-# Settings
+# Настройки
 
 
 sr = speech_recognition.Recognizer()
 sr.pause_threshold = 0.8
 
-
-# Commands
+# Команды
 
 commands_dict = {
     "commands": {
 
-        # Jarvis greeting
+        # Приветствие Jarvis
         "greeting": [
-            "hello jarvis"
+            "привет джарвис"
         ],
 
-        # Create a new task / note
+        # Создание новой задачи / заметки
         "create_task": [
-            "jarvis task",
-            "jarvis note"
+            "джарвис задача",
+            "джарвис заметка"
         ],
 
-        # Play random music from the musicPython folder
+        # Запуск случайной музыки из папки musicPython
         "play_music": [
-            "I simple",
-            "jarvis awp"
+            "я simple",
+            "джарвис awp"
         ],
 
         "open_browser": [
-            "jarvis open browser",
-            "open browser",
-            "launch browser"
+            "джарвис открой браузер",
+            "открой браузер",
+            "запусти браузер"
         ]
     }
 }
 
+# Распознавание речи
 
-# Speech recognition
 
-
-def listen_command():
-    """
-    Listens to speech through the microphone and converts it into text.
-    Returns the recognized command as a string.
-    """
-
+def listen_command(mic):
     try:
-        with speech_recognition.Microphone(device_index=1) as mic:
-            sr.adjust_for_ambient_noise(
-                source=mic,
-                duration=0.5
-            )
-
-            print("Speak...")
-            audio = sr.listen(source=mic)
-
+        audio = sr.listen(source=mic)
         query = sr.recognize_google(
             audio_data=audio,
-            language="en-US"
+            language="ru-RU"
         ).lower()
 
-        print("Recognized:", repr(query))
+        print("Распознано:", repr(query))
 
         return query
 
     except speech_recognition.UnknownValueError:
-        print("I didn't understand what you said")
         return ""
 
-    except speech_recognition.RequestError as error:
-        print("Google connection error:", error)
+    except speech_recognition.RequestError:
         return ""
 
+# Функции команд
 
-# Command functions
-
-def greeting():
+def greeting(mic):
     """
-    Responds to the user's greeting.
+    Отвечает на приветствие пользователя.
     """
-    return "Greetings, my lord"
+    return "здравствуйте милорд"
 
 
-def create_task():
+def create_task(mic):
     """
-    Asks the user for the task
-    and saves it to todo-list.txt.
+    Запрашивает у пользователя текст задачи
+    и сохраняет её в todo-list.txt.
     """
 
-    print("What is the task, my lord?")
+    print("Какова задача милорд?")
 
-    task = listen_command()
+    task = listen_command(mic)
 
     if not task:
         return
@@ -104,36 +85,35 @@ def create_task():
     with open("todo-list.txt", "a", encoding="utf-8") as f:
         f.write(f"{task}\n")
 
-    print(f"Task added: {task}")
+    print(f"Задача добавлена: {task}")
 
-
-def open_browser():
+def open_browser(mic):
     os.startfile(
         r"C:\Users\User\AppData\Local\Programs\Opera GX\opera.exe"
     )
 
-    return "Opening Opera"
+    return "Открываю Оперу"
 
-
-def play_music():
+def play_music(mic):
     """
-    Selects a random music file
-    from the musicPython folder and launches it.
+    Выбирает случайный музыкальный файл
+    из папки musicPython и запускает его.
     """
 
     files = os.listdir("musicPython")
+    print("Файлы:", files)
 
     random_file = os.path.join(
         "musicPython",
         random.choice(files)
     )
 
+    print("Выбран файл:", random_file)
+
     os.startfile(random_file)
 
-    return f"Playing: {os.path.basename(random_file)}"
-
-
-# Mapping commands to functions
+    return f"Запускаю: {os.path.basename(random_file)}"
+# Связь команд с функциями
 
 functions = {
     "greeting": greeting,
@@ -141,35 +121,40 @@ functions = {
     "play_music": play_music,
     "open_browser": open_browser,
 }
-
-
-# Main function
+# Главная функция
 
 def main():
     """
-    Receives a voice command,
-    determines its purpose
-    and launches the corresponding function.
+    Получает голосовую команду,
+    определяет её назначение
+    и запускает соответствующую функцию.
     """
+    #говорит о запуске джарвиса
 
-    query = listen_command()
+    with speech_recognition.Microphone(device_index=1) as mic:
+        print("Калибровка...")
+        sr.adjust_for_ambient_noise(mic, duration=0.5)
 
-    for command_name, phrases in commands_dict["commands"].items():
+        print("Джарвис запущен")
 
-        if query in phrases:
+        # Код для того чтобы программа не выключалась
+        # и чтобы прослушывала постоянно
 
-            result = functions[command_name]()
+        while True:
+            query = listen_command(mic)
 
-            if result:
-                print(result)
+            if not query:
+                continue
 
-            return
+            for command_name, phrases in commands_dict["commands"].items():
+                if query in phrases:
+                    result = functions[command_name](mic)
 
-    print("I don't know such a command")
+                    if result:
+                        print(result)
 
-
-# Run the program
+                    break
+#Запуск программы
 
 if __name__ == "__main__":
     main()
-```
