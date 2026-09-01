@@ -1,31 +1,31 @@
+```python
 import os
 import random
 import speech_recognition
 import webbrowser
 
-# Настройки
-
+# Settings
 
 sr = speech_recognition.Recognizer()
 sr.pause_threshold = 0.8
 
-# Команды
+# Commands
 
 commands_dict = {
     "commands": {
 
-        # Приветствие Jarvis
+        # Jarvis greeting
         "greeting": [
             "привет джарвис"
         ],
 
-        # Создание новой задачи / заметки
+        # Create a new task / note
         "create_task": [
             "джарвис задача",
             "джарвис заметка"
         ],
 
-        # Запуск случайной музыки из папки musicPython
+        # Play random music from the musicPython folder
         "play_music": [
             "я simple",
             "джарвис awp"
@@ -39,18 +39,18 @@ commands_dict = {
     }
 }
 
-# Распознавание речи
-
+# Speech recognition
 
 def listen_command(mic):
     try:
         audio = sr.listen(source=mic)
+
         query = sr.recognize_google(
             audio_data=audio,
             language="ru-RU"
         ).lower()
 
-        print("Распознано:", repr(query))
+        print("Recognized:", repr(query))
 
         return query
 
@@ -60,22 +60,22 @@ def listen_command(mic):
     except speech_recognition.RequestError:
         return ""
 
-# Функции команд
+# Command functions
 
 def greeting(mic):
     """
-    Отвечает на приветствие пользователя.
+    Responds to a greeting.
     """
-    return "здравствуйте милорд"
+    return "Hello, my lord"
 
 
 def create_task(mic):
     """
-    Запрашивает у пользователя текст задачи
-    и сохраняет её в todo-list.txt.
+    Asks the user for a task
+    and saves it to todo-list.txt.
     """
 
-    print("Какова задача милорд?")
+    print("What is the task, my lord?")
 
     task = listen_command(mic)
 
@@ -85,35 +85,36 @@ def create_task(mic):
     with open("todo-list.txt", "a", encoding="utf-8") as f:
         f.write(f"{task}\n")
 
-    print(f"Задача добавлена: {task}")
+    print(f"Task added: {task}")
+
 
 def open_browser(mic):
     os.startfile(
         r"C:\Users\User\AppData\Local\Programs\Opera GX\opera.exe"
     )
 
-    return "Открываю Оперу"
+    return "Opening Opera"
+
 
 def play_music(mic):
     """
-    Выбирает случайный музыкальный файл
-    из папки musicPython и запускает его.
+    Selects a random music file
+    from the musicPython folder and launches it.
     """
 
     files = os.listdir("musicPython")
-    print("Файлы:", files)
 
     random_file = os.path.join(
         "musicPython",
         random.choice(files)
     )
 
-    print("Выбран файл:", random_file)
-
     os.startfile(random_file)
 
-    return f"Запускаю: {os.path.basename(random_file)}"
-# Связь команд с функциями
+    return f"Playing: {os.path.basename(random_file)}"
+
+
+# Map commands to functions
 
 functions = {
     "greeting": greeting,
@@ -121,24 +122,27 @@ functions = {
     "play_music": play_music,
     "open_browser": open_browser,
 }
-# Главная функция
+
+
+# Main function
 
 def main():
     """
-    Получает голосовую команду,
-    определяет её назначение
-    и запускает соответствующую функцию.
+    Listens for voice commands,
+    determines their purpose,
+    and executes the corresponding function.
     """
-    #говорит о запуске джарвиса
+
+    # Announces that Jarvis has started
 
     with speech_recognition.Microphone(device_index=1) as mic:
-        print("Калибровка...")
+        print("Calibrating...")
         sr.adjust_for_ambient_noise(mic, duration=0.5)
 
-        print("Джарвис запущен")
+        print("Jarvis started")
 
-        # Код для того чтобы программа не выключалась
-        # и чтобы прослушывала постоянно
+        # Keeps the program running
+        # and continuously listens for commands
 
         while True:
             query = listen_command(mic)
@@ -154,7 +158,10 @@ def main():
                         print(result)
 
                     break
-#Запуск программы
+
+
+# Run the program
 
 if __name__ == "__main__":
     main()
+```
