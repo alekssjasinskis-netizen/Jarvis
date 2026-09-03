@@ -1,8 +1,10 @@
-```python
 import os
 import random
 import speech_recognition
+import pygame
 import webbrowser
+
+pygame.mixer.init()
 
 # Settings
 
@@ -16,28 +18,37 @@ commands_dict = {
 
         # Jarvis greeting
         "greeting": [
-            "привет джарвис"
+            "hello jarvis"
         ],
 
         # Create a new task / note
         "create_task": [
-            "джарвис задача",
-            "джарвис заметка"
+            "jarvis task",
+            "jarvis note"
         ],
 
         # Play random music from the musicPython folder
         "play_music": [
-            "я simple",
-            "джарвис awp"
+            "play music",
+            "jarvis play music"
         ],
 
+        # Open browser
         "open_browser": [
-            "джарвис открой браузер",
-            "открой браузер",
-            "запусти браузер"
+            "jarvis open browser",
+            "open browser",
+            "launch browser"
+        ],
+
+        # Shut down Jarvis
+        "shutdown": [
+            "jarvis shut down",
+            "jarvis stop",
+            "jarvis go offline"
         ]
     }
 }
+
 
 # Speech recognition
 
@@ -47,7 +58,7 @@ def listen_command(mic):
 
         query = sr.recognize_google(
             audio_data=audio,
-            language="ru-RU"
+            language="en-US"
         ).lower()
 
         print("Recognized:", repr(query))
@@ -60,18 +71,19 @@ def listen_command(mic):
     except speech_recognition.RequestError:
         return ""
 
+
 # Command functions
 
 def greeting(mic):
     """
-    Responds to a greeting.
+    Responds to the user's greeting.
     """
-    return "Hello, my lord"
+    return "Hello, my lord."
 
 
 def create_task(mic):
     """
-    Asks the user for a task
+    Asks the user for the task text
     and saves it to todo-list.txt.
     """
 
@@ -93,7 +105,7 @@ def open_browser(mic):
         r"C:\Users\User\AppData\Local\Programs\Opera GX\opera.exe"
     )
 
-    return "Opening Opera"
+    return "Opening Opera."
 
 
 def play_music(mic):
@@ -104,23 +116,39 @@ def play_music(mic):
 
     files = os.listdir("musicPython")
 
+    print("Files:", files)
+
     random_file = os.path.join(
         "musicPython",
         random.choice(files)
     )
+
+    print("Selected file:", random_file)
 
     os.startfile(random_file)
 
     return f"Playing: {os.path.basename(random_file)}"
 
 
-# Map commands to functions
+def play_sound(filename):
+    file = os.path.join("JarvisSounds", filename)
+
+    if not os.path.exists(file):
+        print(f"Sound file not found: {file}")
+        return
+
+    pygame.mixer.music.load(file)
+    pygame.mixer.music.play()
+
+
+# Connect commands to functions
 
 functions = {
     "greeting": greeting,
     "create_task": create_task,
     "play_music": play_music,
     "open_browser": open_browser,
+    "shutdown": None,
 }
 
 
@@ -128,30 +156,42 @@ functions = {
 
 def main():
     """
-    Listens for voice commands,
-    determines their purpose,
-    and executes the corresponding function.
+    Receives a voice command,
+    determines its purpose,
+    and runs the corresponding function.
     """
 
-    # Announces that Jarvis has started
+    # Announces that Jarvis is starting
 
     with speech_recognition.Microphone(device_index=1) as mic:
         print("Calibrating...")
+
         sr.adjust_for_ambient_noise(mic, duration=0.5)
 
-        print("Jarvis started")
+        print("Jarvis started.")
 
-        # Keeps the program running
-        # and continuously listens for commands
+        play_sound("loadingEnd.mp3")
+
+        # Keep the program running
+        # and listen continuously
 
         while True:
             query = listen_command(mic)
+
+            if query in commands_dict["commands"]["shutdown"]:
+                print("Jarvis shutting down.")
+                break
 
             if not query:
                 continue
 
             for command_name, phrases in commands_dict["commands"].items():
+
                 if query in phrases:
+
+                    if command_name == "shutdown":
+                        break
+
                     result = functions[command_name](mic)
 
                     if result:
@@ -163,5 +203,9 @@ def main():
 # Run the program
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+
+    except KeyboardInterrupt:
+        print("\nJarvis has been shut down.")
 ```
