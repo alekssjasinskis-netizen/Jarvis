@@ -10,22 +10,37 @@ A custom voice assistant inspired by JARVIS from Marvel.
 * Random music playback
 * Browser launching
 * Voice greeting
+* System sound effects
+* Startup and shutdown sounds
 
 ## Voice Commands
 
 Currently supported commands:
 
-* `привет джарвис` — voice greeting
-* `джарвис задача` — create a task
-* `джарвис заметка` — create a note
-* `я simple` — play random music
-* `джарвис открой браузер` — open Opera GX
+* `hello jarvis` — voice greeting
+* `jarvis task` — create a task
+* `jarvis note` — create a note
+* `play simple` — play random music
+* `jarvis open browser` — open Opera GX
+* `jarvis shut down` — shut down Jarvis
+* `jarvis stand down` — shut down Jarvis
 
 ## Technologies
 
 * Python
 * SpeechRecognition
 * Google Speech Recognition API
+* Pygame
+
+## Project Structure
+
+```text
+Jarvis/
+├── JarvisSounds/       # System sound effects
+├── musicPython/        # Music files
+├── jarvis.py           # Main program
+└── todo-list.txt       # Saved tasks
+```
 
 ## Current Status
 
